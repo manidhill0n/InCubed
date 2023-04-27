@@ -1,0 +1,95 @@
+Below code preprocesses, and downloads the Sentinel-2 NDVI data on Google Earth Engine (GEE).
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+                                   GEE CODE TO DOWNLOAD THE CLOUD AND SHADOW FREE SENTINEL-2 NDVI TIME SERIES
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+//Selecting the area of interest
+	var AOI = ee.FeatureCollection("users/manidhillon1989/ter_box");
+//Package required to remove clouds from the Sentinel-2 data
+	var cld = require('users/fitoprincipe/geetools:cloud_masks')
+//Downloading Sentinel-2 image collection for certain time frame
+	var Sentinel2 = ee.ImageCollection("COPERNICUS/S2_SR")
+              		.filter(ee.Filter.lt("CLOUDY_PIXEL_PERCENTAGE", 15))
+                	.filterBounds(AOI)
+                	.filterDate("2020-03-01", "2023-01-31")
+
+//creating a function to calculate NDVI of the image collection and removing clouds and shadows using the quality assessment band             
+	var clean_ls_coll       = Sentinel2.map(function(img){
+  // Select mask band 'pixel_qa'
+ 	var QA60 = img.select(['QA60']);
+  // Creating an ndvi image
+  	var ndvi              = img.normalizedDifference(['B8', 'B4']).rename('NDVI');
+  // returning the original image but with no bands, then adding the ndvi band, and finally masking clouds and shadows
+  	return img.select([]).addBands(ndvi).clip(AOI).updateMask(QA60.lt(1))
+  //reproject(proj, null, 30);
+  
+})
+
+	print(clean_ls_coll.first())
+//For visualization
+	Map.addLayer(clean_ls_coll)
+	var S2 = clean_ls_coll.map(cld.sclMask())
+	Map.addLayer(S2.first())
+// generating a sequence of desired years, dates for returning the julian day of the year
+	var y_list              = ee.List.sequence(2020,2023);
+
+	var dates               = clean_ls_coll.aggregate_histogram('system:time_start')
+	var dates_key           = ee.Dictionary(dates).keys()
+
+	var true_date           = dates_key.map(function(k){
+  	return ee.Date(ee.Number.parse(k)).format('D')
+	})
+
+
+	var test                = y_list.map(function(year){
+  	var coll              = clean_ls_coll.filter(ee.Filter.calendarRange(year, year, 'year'))
+  	var dates             = coll.aggregate_histogram('system:time_start')
+  	var dates_key         = ee.Dictionary(dates).keys()
+  
+ 	var true_date           = dates_key.map(function(k){
+    	return ee.Number.parse(ee.Date(ee.Number.parse(k)).format('D'))
+  	}).distinct()
+
+  	var j_img           = true_date.map(function(img){
+  	return coll.filter(ee.Filter.calendarRange(img, img, 'day_of_year'))
+	})
+
+	return j_img
+	}).flatten()
+
+	var test_img            = test.map(function(img){
+  	var prop              = ee.ImageCollection(img).first().get(('system:time_start'))
+  	return ee.ImageCollection(img).mean().set('system:time_start', prop)
+	})
+
+	var dates     = ee.Dictionary(ee.ImageCollection(test_img).aggregate_histogram('system:time_start')).keys()
+
+	var true_date1           = dates.map(function(k){
+   	var doty            = ee.Number.parse(ee.Date(ee.Number.parse(k)).format('D'))
+    	var year            = ee.Number.parse(ee.Date(ee.Number.parse(k)).format('y'))
+    
+    	return ee.String(year).cat('_').cat(ee.String(doty).cat('_ter_S2_NDVI'))
+ 	})
+
+	print(true_date1)
+//print(true_date1.get(1).getInfo())
+//Map.addLayer(ee.Image(test_img.get(1)), {}, 'Image_No_1');
+
+	var n = test_img.size().getInfo();
+// applying loop to download the NDVI data to the google drive
+	for (var i = 0; i < n; i++) {
+	Export.image.toDrive({
+        image:ee.Image(test_img.get(i)),
+        description: true_date1.get(i).getInfo(),
+        folder: 'InCubed',
+       
+        region: AOI,
+        scale: 10,
+        maxPixels:1e10
+       })
+  
+}
