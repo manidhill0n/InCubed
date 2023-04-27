@@ -9,5 +9,5 @@ It containes two parts of code:
     a) GEEcode_Sentinel-2.txt
     b) Sample Maps for ENT (Sentinel_2_ENT_NDVI.jpg) and TER (Sentinel_2_TER_NDVI.jpg)
     
-    ![alt text](https://github.com/manidhill0n/InCubed/blob/main/Sentinel_2_ENT_NDVI.jpg?raw=true)
+   
     
