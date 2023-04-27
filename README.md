@@ -1,6 +1,6 @@
 # InCubed
 The reporsitory is designed to share the code and material for the InCubed project.
-It containes two parts of code:
+It containes two parts:
   1) Download and preprocess the Planet dataset from the Amazon Web Server (AWS) using R. The respective files are:
     a)  README.txt
     b)  AWS_download_img.R
