@@ -8,5 +8,6 @@ It containes two parts of code:
   3) Download na dpreporcess the Sentinel-2 dataset from Google Earth Engine (GEE) using Java script. The respective files are:
     a) GEEcode_Sentinel-2.txt
     b) Sample Maps for ENT (Sentinel_2_ENT_NDVI.jpg) and TER (Sentinel_2_TER_NDVI.jpg)
-    https://github.com/manidhill0n/InCubed/blob/main/Sentinel_2_ENT_NDVI.jpg
+    
+    ![alt text](https://github.com/manidhill0n/InCubed/blob/main/Sentinel_2_ENT_NDVI.jpg)
     
