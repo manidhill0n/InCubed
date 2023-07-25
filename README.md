@@ -11,7 +11,9 @@ Download Planet dataset from the Amazon Web Server (AWS) and Process data using 
     d)  **04_Classification** including training a Random Forest model and predicting Land Cover Classification  
 
 ### training data used for classification 
-  <img src="https://github.com/manidhill0n/InCubed/blob/main/viz/Training_samples.png" alt="Alt text" title="Visualization of training samples for Random Forest">
+  <img src="https://github.com/manidhill0n/InCubed/blob/main/viz/Training_samples.png" alt="Alt text" title="Visualization of training samples for Random Forest">  
+
+  
 ### sample results of time Series Analysis 
   <img src="https://github.com/manidhill0n/InCubed/blob/main/viz/Time_Series_results.png" alt="Alt text" title="Visualization of Time Series Results">
 
